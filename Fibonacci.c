@@ -126,14 +126,14 @@ bool CommandLineValidator(int argumentCount, char* arguments[])
 
 int main(int argc, char* argv[])
 {
-	system("clear");
-
 	//Validate commandline arguments
 	bool isCommandLineArgumentValid = CommandLineValidator(argc, argv);
 	if(!isCommandLineArgumentValid)
 	{
 		exit(0);
 	}
+
+	system("clear");
 
 	//Initializing arrays
 	memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
