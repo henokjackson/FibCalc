@@ -8,8 +8,6 @@
 #include<time.h>
 
 #define MAX_DIGITS 999999999
-#define RANGE_MAX_DIGITS 32
-
 
 struct fibonacci{
 	uint8_t number[MAX_DIGITS];
@@ -39,63 +37,57 @@ void DisplayCommandLineArgumentsHelp()
 	printf("\tSpecifying range:\n");
 	printf("  --range=max\t\tGenerates the maximum possible fibonacci number that can be generated with the given heap.\n");
 	printf("  --range=N\t\tGenerates the Nth fibonacci number if enough heap space is available.\n");
+
+	return;
 }
 
-long long int RangeValueParser(char* string)
+long long int ParseRange(char* argument)
 {
 	int index = 0;
 	unsigned long long int range = 0;
-	const char* rangeString = "--range=\0";
+	const char* rangeArgumentString = "--range=\0";
 
-	// Parse text
-	for(; rangeString[index] != '\0'; index++)
+	for(; rangeArgumentString[index] != '\0'; index++)
 	{
-		if(string[index] != rangeString[index])
+		if(argument[index] != rangeArgumentString[index])
 		{
-			printf("\nUnknown character '%c' in argument.", string[index]);
+			printf("\nUnknown argument: %s", argument);
 			DisplayCommandLineArgumentsHelp();
 			return -1;
 		}
 	}
 
-	// Read argument value
-	for(; string[index] != '\0'; index++)
-	{
-		if(isalpha(string[index] == 0))
-		{
-			return -1;
-		}
-		else
-		{
-
-		}
-	}
-
 	// Case: No number
-	if(string[index] == '\0')
+	if(argument[index] == '\0')
 	{
 		return -1;
 	}
 
-	// Case: Number Exists
-	if(string)
-
-
-	// Parse number
-	for(; string[index] != '\0', index++;)
+	for(; argument[index] != '\0'; index++)
 	{
-		range += (int)string[index];
-		range *= 10;
+		// Case: If malformed range input
+		if(isalpha(argument[index] == 0))
+		{
+			return -1;
+		}
+
+		// Case: Number Exists
+		else
+		{
+			range *= 10;
+			// char -> int
+			range += (int)(argument[index] - '0');
+		}
 	}
 
 	return range;
 }
 
-int RangeDecider(char* arg)
+long long int DecideRange(char* argument)
 {
 	long long int range = 0;
 
-	if(strcmp(arg, "--range=max"))
+	if(strcmp(argument, "--range=max"))
 	{
 		//TODO: Write the logic for setting range so that the loop runs infinetly.
 		/**Currently using the max limit since it's impossible to estimate the highest
@@ -104,33 +96,31 @@ int RangeDecider(char* arg)
 	}
 	else
 	{
-		range = RangeValueParser(arg);
-		if(range == NULL)
-		{
-			return -1;
-		}
+		range = ParseRange(argument);
 	}
 
-	return 0;
+	return range;
 }
 
-bool CommandLineValidator(int argc, char* argv[])
+bool CommandLineValidator(int argumentCount, char* arguments[])
 {
-	//Decision variable
+	// Decision variable
 	// -1 -> Failed
 	//  0 -> Success
 	int decision = -1;
+	long long int range = 0;
 
-	if(argc != 1)
+	if(argumentCount != 1)
 	{
+		printf("\nToo many arguments !");
 		DisplayCommandLineArgumentsHelp();
 	}
 	else
 	{
-		decision = RangeDecider(argv[1]);
+		range = DecideRange(arguments[1]);
 	}
 
-	return decision == -1 ? false : true;
+	return decision = (range == -1 || 0 ? false : true);
 
 }
 
@@ -139,7 +129,11 @@ int main(int argc, char* argv[])
 	system("clear");
 
 	//Validate commandline arguments
-
+	bool isCommandLineArgumentValid = CommandLineValidator(argc, argv);
+	if(!isCommandLineArgumentValid)
+	{
+		exit(0);
+	}
 
 	//Initializing arrays
 	memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
@@ -196,7 +190,6 @@ int main(int argc, char* argv[])
 			//Overflow detection
 			if (fibonacci[2].number[0] != 0)
 			{
-				system("clear");
 				printf("Possible overflow in next iteration.\n Terminating..\n");
 				PrintFibonacci(&fibonacci[2], j);
 				totalTime = CalculateExecutionTime(startTime, clock());
