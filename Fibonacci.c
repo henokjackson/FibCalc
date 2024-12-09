@@ -9,12 +9,17 @@
 
 #define MAX_DIGITS 999999999
 
-struct fibonacci{
+struct CommandLineValidationResult{
+	bool decision;
+	long long int range;
+}commandLineValidationResult;
+
+struct Fibonacci{
 	uint8_t number[MAX_DIGITS];
 	unsigned long long int size;
 }fibonacci[3];
 
-void PrintFibonacci(struct fibonacci* fibonacciPtr, unsigned long long int ordinal)
+void PrintFibonacci(struct Fibonacci* fibonacciPtr, unsigned long long int ordinal)
 {
 	//Print the fibonacci number
 	printf("%lluth Fibonacci Number : \n\n", ordinal + 2);
@@ -35,8 +40,8 @@ void DisplayCommandLineArgumentsHelp()
 	printf("\n\nUsage: ./Fibonacci [RANGE ...]\n");
 	printf("Examples:\n");
 	printf("\tSpecifying range:\n");
-	printf("  --range=max\t\tGenerates the maximum possible fibonacci number that can be generated with the given heap.\n");
-	printf("  --range=N\t\tGenerates the Nth fibonacci number if enough heap space is available.\n");
+	printf("\t\t--range=max\tGenerates the maximum possible fibonacci number that can be generated with the given heap.\n");
+	printf("\t\t--range=N\tGenerates the Nth fibonacci number if enough heap space is available.\n");
 
 	return;
 }
@@ -87,7 +92,7 @@ long long int DecideRange(char* argument)
 {
 	long long int range = 0;
 
-	if(strcmp(argument, "--range=max"))
+	if(strcmp(argument, "--range=max") == 0)
 	{
 		//TODO: Write the logic for setting range so that the loop runs infinetly.
 		/**Currently using the max limit since it's impossible to estimate the highest
@@ -102,7 +107,7 @@ long long int DecideRange(char* argument)
 	return range;
 }
 
-bool CommandLineValidator(int argumentCount, char* arguments[])
+struct CommandLineValidationResult CommandLineValidator(int argumentCount, char* arguments[])
 {
 	// Decision variable
 	// -1 -> Failed
@@ -110,7 +115,7 @@ bool CommandLineValidator(int argumentCount, char* arguments[])
 	int decision = -1;
 	long long int range = 0;
 
-	if(argumentCount != 1)
+	if(argumentCount != 2)
 	{
 		printf("\nToo many arguments !");
 		DisplayCommandLineArgumentsHelp();
@@ -120,15 +125,18 @@ bool CommandLineValidator(int argumentCount, char* arguments[])
 		range = DecideRange(arguments[1]);
 	}
 
-	return decision = (range == -1 || 0 ? false : true);
+	struct CommandLineValidationResult result;
+	result.decision = (range == -1 || 0 ? false : true);
+	result.range = range;
 
+	return result;
 }
 
 int main(int argc, char* argv[])
 {
 	//Validate commandline arguments
-	bool isCommandLineArgumentValid = CommandLineValidator(argc, argv);
-	if(!isCommandLineArgumentValid)
+	struct CommandLineValidationResult result = CommandLineValidator(argc, argv);
+	if(!result.decision)
 	{
 		exit(0);
 	}
@@ -150,8 +158,7 @@ int main(int argc, char* argv[])
 	uint8_t sum = 0;
 	unsigned long long int i = 0;
 	unsigned long long int j = 0;
-	unsigned long long int range = atoi(argv[1]);
-
+	long long int range = result.range;
 	//Setting intial conditions
 	fibonacci[0].number[MAX_DIGITS - 1] = 0;
 	fibonacci[1].number[MAX_DIGITS - 1] = 1;
@@ -221,7 +228,7 @@ int main(int argc, char* argv[])
 
 	//Print performance results
 	totalTime = CalculateExecutionTime(startTime, endTime);
-	printf("\n\n\nCalculation Time: %Lf secs\n\n", totalTime);
+	printf("\n\nCalculation Time: %Lf secs\n\n", totalTime);
 
 	return 0;
 }
