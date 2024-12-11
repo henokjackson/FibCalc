@@ -22,7 +22,7 @@ struct Fibonacci{
 void PrintFibonacci(struct Fibonacci* fibonacciPtr, unsigned long long int ordinal)
 {
 	//Print the fibonacci number
-	printf("%lluth Fibonacci Number : \n\n", ordinal + 2);
+	printf("%lluth Fibonacci Number : \n\n", ordinal + 1);
 	for(int i = (MAX_DIGITS - fibonacciPtr -> size); i < MAX_DIGITS; i++)
 	{
 		printf("%d", fibonacciPtr -> number[i]);
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 	startTime = clock();
 
 	//Calculate fibonacci series
-	for(; j < (range - 2); j++)
+	for(; j < (range - 1); j++)
 	{
 		for(i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacci[2].size - 1); i--)
 		{
