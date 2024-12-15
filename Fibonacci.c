@@ -16,7 +16,7 @@ struct CommandLineValidationResult{
 
 struct Fibonacci{
 	uint8_t number[MAX_DIGITS];
-	unsigned long long int size;
+	long long int size;
 }fibonacci[3];
 
 void PrintFibonacci(struct Fibonacci* fibonacciPtr, unsigned long long int ordinal)
@@ -49,7 +49,7 @@ void DisplayCommandLineArgumentsHelp()
 long long int ParseRange(char* argument)
 {
 	int index = 0;
-	unsigned long long int range = 0;
+	long long int range = 0;
 	const char* rangeArgumentString = "--range=\0";
 
 	for(; rangeArgumentString[index] != '\0'; index++)
@@ -65,15 +65,19 @@ long long int ParseRange(char* argument)
 	// Case: No number
 	if(argument[index] == '\0')
 	{
+		printf("\nValue not specified for argument: %s", argument);
+		DisplayCommandLineArgumentsHelp();
 		return -1;
 	}
 
 	for(; argument[index] != '\0'; index++)
 	{
 		// Case: If malformed range input
-		if(isalpha(argument[index] == 0))
+		if(isalpha(argument[index]) != 0)
 		{
-			return -1;
+			printf("\nInvalid range: %s", argument);
+			DisplayCommandLineArgumentsHelp();
+			return -1;		
 		}
 
 		// Case: Number Exists
@@ -112,7 +116,6 @@ struct CommandLineValidationResult CommandLineValidator(int argumentCount, char*
 	// Decision variable
 	// -1 -> Failed
 	//  0 -> Success
-	int decision = -1;
 	long long int range = 0;
 
 	if(argumentCount != 2)
@@ -143,10 +146,18 @@ int main(int argc, char* argv[])
 
 	system("clear");
 
+	//Performance testing parameters
+	clock_t startTime = 0;
+	clock_t endTime = 0;
+	long double totalTime = 0;
+
+	//Performance testing
+	startTime = clock();
+	
 	//Initializing arrays
-	memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
-	memset(fibonacci[1].number, 0, sizeof(fibonacci[1].number));
-	memset(fibonacci[2].number, 0, sizeof(fibonacci[2].number));
+	//memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
+	//memset(fibonacci[1].number, 0, sizeof(fibonacci[1].number));
+	//memset(fibonacci[2].number, 0, sizeof(fibonacci[2].number));
 
 	//Initialize size
 	fibonacci[0].size = 1;
@@ -156,20 +167,12 @@ int main(int argc, char* argv[])
 	//Mathematical parameters
 	uint8_t carry = 0;
 	uint8_t sum = 0;
-	unsigned long long int i = 0;
-	unsigned long long int j = 0;
+	long long int i = 0;
+	long long int j = 0;
 	long long int range = result.range;
 	//Setting intial conditions
 	fibonacci[0].number[MAX_DIGITS - 1] = 0;
 	fibonacci[1].number[MAX_DIGITS - 1] = 1;
-
-	//Performance testing parameters
-	clock_t startTime = 0;
-	clock_t endTime = 0;
-	long double totalTime = 0;
-
-	//Performance testing
-	startTime = clock();
 
 	//Calculate fibonacci series
 	for(; j < (range - 1); j++)
