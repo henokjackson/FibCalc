@@ -1,5 +1,6 @@
 #include<ctype.h>
 #include<limits.h>
+#include<CircularQueue.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -154,7 +155,9 @@ int main(int argc, char* argv[])
 	//Performance testing
 	startTime = clock();
 	
-	//Initializing arrays
+	// TODO: Write code such that the elements of the error will be set to zero prior
+	// to their setting of values.
+	// Initializing arrays
 	//memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
 	//memset(fibonacci[1].number, 0, sizeof(fibonacci[1].number));
 	//memset(fibonacci[2].number, 0, sizeof(fibonacci[2].number));
@@ -170,6 +173,7 @@ int main(int argc, char* argv[])
 	long long int i = 0;
 	long long int j = 0;
 	long long int range = result.range;
+
 	//Setting intial conditions
 	fibonacci[0].number[MAX_DIGITS - 1] = 0;
 	fibonacci[1].number[MAX_DIGITS - 1] = 1;
@@ -200,12 +204,16 @@ int main(int argc, char* argv[])
 			//Overflow detection
 			if (fibonacci[2].number[0] != 0)
 			{
-				printf("Possible overflow in next iteration.\n Terminating..\n");
+				printf("Possible overflow in next iteration.\nTerminating....\n\n");
 				PrintFibonacci(&fibonacci[2], j);
 				totalTime = CalculateExecutionTime(startTime, clock());
 				printf("\n\n\nCalculation Time: %Lf secs\n\n", totalTime);
+				exit(0);
 			}
 		}
+		
+		// TODO: Rotate pointers instead of copying
+		// TODO: Data flow resembles a circular queue -> Implement a library.
 
 		//Swap the arrays [Copying]
 		for(i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacci[1].size - 1); i--)
