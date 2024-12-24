@@ -8,7 +8,7 @@
 #include<stdbool.h>
 #include<time.h>
 
-#define MAX_DIGITS 999999999
+#define MAX_DIGITS 99999999
 
 struct CommandLineValidationResult{
 	bool decision;

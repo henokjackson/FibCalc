@@ -12,7 +12,7 @@ INCL := lib/CircularQueue
 SRC := Fibonacci
 
 # Flags
-CFLAGS := -Wall -Wextra -pedantic -std=c11 -O3 -c -g -Ilib
+CFLAGS := -Wall -Wextra -pedantic -std=c11 -O3 -c -Ilib
 
 # Targets
 ${SRC}: ${SRC}.o ${INCL}.o
