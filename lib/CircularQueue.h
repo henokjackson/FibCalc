@@ -34,12 +34,6 @@
 #define CIRCULAR_QUEUE_H
 
 /**
- * Initialize - Initializes the circular queue with the first element.
- * data: The integer to be inserted into the queue.
- */
-void Initialize(int data);
-
-/**
  * Insert - Inserts a new element into the queue.
  * data: The integer value to be inserted.
  */
