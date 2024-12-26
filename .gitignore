@@ -1,3 +1,4 @@
 Fibonacci
 .vscode/*
 *.swp
+*.o
