@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 		fibonacciNumber2Ptr = &fibonacci[Peek()];
 		fibonacciSumPtr = &fibonacci[Peek()];
 		Peek(); // Seeking Queue By 1 to maintain flow.
-
+		fibonacciSumPtr -> size = fibonacciNumber2Ptr -> size;
 		if(isInitialRun)
 		{
 			// Initialize size
