@@ -23,6 +23,8 @@ void Initialize(int data)
 
 	// Initilaize Cursor
 	cursorPtr = startPtr;
+
+	return;
 }
 
 void Insert(int data)
@@ -39,6 +41,10 @@ void Insert(int data)
 		tempPtr -> nextPtr = startPtr;
 		endPtr = tempPtr;
 	}
+	
+	cursorPtr = startPtr;
+
+	return;
 }
 
 int Peek()
