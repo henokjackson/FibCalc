@@ -136,6 +136,12 @@ struct CommandLineValidationResult CommandLineValidator(int argumentCount, char*
 	return result;
 }
 
+void WriteToFile(FILE* filePtr, long double time, long long int number)
+{
+	fprintf(filePtr, "%lld,%lld,", number, (long long int)(time*10000000));
+	return;	
+}
+
 int main(int argc, char* argv[])
 {
 	// Validate commandline arguments
@@ -151,9 +157,6 @@ int main(int argc, char* argv[])
 	clock_t startTime = 0;
 	clock_t endTime = 0;
 	long double totalTime = 0;
-
-	// Performance testing
-	startTime = clock();
 	
 	// TODO: Write code such that the elements of the error will be set to zero prior to their setting of values.
 	// Initializing arrays
@@ -180,6 +183,13 @@ int main(int argc, char* argv[])
 	struct Fibonacci *fibonacciNumber1Ptr;
 	struct Fibonacci *fibonacciNumber2Ptr;
 	struct Fibonacci *fibonacciSumPtr;
+
+	//File Handling
+	FILE* filePtr;
+	filePtr = fopen("stats.txt", "w");
+
+	// Performance testing
+	startTime = clock();
 
 	// Calculate fibonacci series
 	for(; j < (range - 1); j++)
@@ -234,10 +244,15 @@ int main(int argc, char* argv[])
 				exit(0);
 			}
 		}
+	
+		// Performance testing
+		endTime = clock();
+		totalTime = CalculateExecutionTime(startTime, endTime);
+		WriteToFile(filePtr, totalTime, j + 1);
 	}
 
-	// Performance testing
-	endTime = clock();
+	//Close file stream
+	fclose(filePtr);
 
 	// Print the fibonacci number
 	PrintFibonacci(fibonacciSumPtr, j);
