@@ -1,6 +1,5 @@
 #include<ctype.h>
 #include<limits.h>
-#include<CircularQueue.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -9,6 +8,8 @@
 #include<time.h>
 
 #define MAX_DIGITS 99999999
+#define NO_OF_ARRAYS 3
+
 
 struct CommandLineValidationResult{
 	bool decision;
@@ -28,6 +29,7 @@ void PrintFibonacci(struct Fibonacci* fibonacciPtr, unsigned long long int ordin
 	{
 		printf("%d", fibonacciPtr -> number[i]);
 	}
+
 	return;
 }
 
@@ -63,7 +65,7 @@ long long int ParseRange(char* argument)
 		}
 	}
 
-	// Case: No number
+	// If no number
 	if(argument[index] == '\0')
 	{
 		printf("\nValue not specified for argument: %s", argument);
@@ -73,7 +75,7 @@ long long int ParseRange(char* argument)
 
 	for(; argument[index] != '\0'; index++)
 	{
-		// Case: If malformed range input
+		// If malformed range input
 		if(isalpha(argument[index]) != 0)
 		{
 			printf("\nInvalid range: %s", argument);
@@ -81,7 +83,7 @@ long long int ParseRange(char* argument)
 			return -1;		
 		}
 
-		// Case: Number Exists
+		// If number exists
 		else
 		{
 			range *= 10;
@@ -114,9 +116,6 @@ long long int DecideRange(char* argument)
 
 struct CommandLineValidationResult CommandLineValidator(int argumentCount, char* arguments[])
 {
-	// Decision variable
-	// -1 -> Failed
-	//  0 -> Success
 	long long int range = 0;
 
 	if(argumentCount != 2)
@@ -138,7 +137,7 @@ struct CommandLineValidationResult CommandLineValidator(int argumentCount, char*
 
 int main(int argc, char* argv[])
 {
-	//Validate commandline arguments
+	// Validate commandline arguments
 	struct CommandLineValidationResult result = CommandLineValidator(argc, argv);
 	if(!result.decision)
 	{
@@ -147,97 +146,98 @@ int main(int argc, char* argv[])
 
 	system("clear");
 
-	//Performance testing parameters
+	// Performance testing parameters
 	clock_t startTime = 0;
 	clock_t endTime = 0;
 	long double totalTime = 0;
-
-	//Performance testing
-	startTime = clock();
 	
-	// TODO: Write code such that the elements of the error will be set to zero prior
-	// to their setting of values.
+	// TODO: Write code such that the elements of the error will be set to zero prior to their setting of values.
 	// Initializing arrays
-	//memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
-	//memset(fibonacci[1].number, 0, sizeof(fibonacci[1].number));
-	//memset(fibonacci[2].number, 0, sizeof(fibonacci[2].number));
+	memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
+	memset(fibonacci[1].number, 0, sizeof(fibonacci[1].number));
+	memset(fibonacci[2].number, 0, sizeof(fibonacci[2].number));
 
-	//Initialize size
-	fibonacci[0].size = 1;
-	fibonacci[1].size = 1;
-	fibonacci[2].size = fibonacci[1].size;
-
-	//Mathematical parameters
+	// Mathematical parameters
 	uint8_t carry = 0;
 	uint8_t sum = 0;
 	long long int i = 0;
 	long long int j = 0;
 	long long int range = result.range;
 
-	//Setting intial conditions
-	fibonacci[0].number[MAX_DIGITS - 1] = 0;
-	fibonacci[1].number[MAX_DIGITS - 1] = 1;
+	// Initial Run
+	bool isInitialRun = true;
 
-	//Calculate fibonacci series
+	// Array Pointers - Initial Conditions
+	struct Fibonacci *fibonacciNumber1Ptr;
+	struct Fibonacci *fibonacciNumber2Ptr;
+	struct Fibonacci *fibonacciSumPtr;
+
+	// Performance testing
+	startTime = clock();
+
+	// Calculate fibonacci series
 	for(; j < (range - 1); j++)
 	{
-		for(i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacci[2].size - 1); i--)
+		// Pointer Swapping
+		fibonacciNumber1Ptr = &fibonacci[(j + 0) % NO_OF_ARRAYS];
+		fibonacciNumber2Ptr = &fibonacci[(j + 1) % NO_OF_ARRAYS];
+		fibonacciSumPtr = &fibonacci[(j + 2) % NO_OF_ARRAYS];
+		fibonacciSumPtr -> size = fibonacciNumber2Ptr -> size;
+		
+		if(isInitialRun)
 		{
-			sum = fibonacci[0].number[i] + fibonacci[1].number[i] + carry;
+			// Initialize size
+			fibonacciNumber1Ptr -> size = 1;
+			fibonacciNumber2Ptr -> size = 1;
+			fibonacciSumPtr -> size = 1;
+
+			// Setting intial conditions
+			fibonacciNumber1Ptr -> number[MAX_DIGITS - 1] = 0;
+			fibonacciNumber2Ptr -> number[MAX_DIGITS - 1] = 1;
+
+			isInitialRun = false;
+		}
+
+		for(i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacciSumPtr -> size - 1); i--)
+		{
+			sum = fibonacciNumber1Ptr -> number[i] + fibonacciNumber2Ptr -> number[i] + carry;
 			carry = 0;
 
-			//Case: carry generated
+			// If carry generated
 			if (sum > 9)
 			{
 				carry = 1;
-				if((MAX_DIGITS - fibonacci[1].size) == i)
+				if((MAX_DIGITS - fibonacciNumber2Ptr -> size) == i)
 				{
-					fibonacci[2].size++;
+					fibonacciSumPtr -> size++;
 				}
-				fibonacci[2].number[i] = sum % 10;
+				fibonacciSumPtr -> number[i] = sum % 10;
 			}
 			else
 			{
-				fibonacci[2].number[i] = sum;
+				fibonacciSumPtr -> number[i] = sum;
 			}
 
-			//Overflow detection
-			if (fibonacci[2].number[0] != 0)
+			// Overflow detection
+			if (fibonacciSumPtr -> number[0] != 0)
 			{
 				printf("Possible overflow in next iteration.\nTerminating....\n\n");
-				PrintFibonacci(&fibonacci[2], j);
+				PrintFibonacci(fibonacciSumPtr, j);
 				totalTime = CalculateExecutionTime(startTime, clock());
 				printf("\n\n\nCalculation Time: %Lf secs\n\n", totalTime);
 				exit(0);
 			}
 		}
-		
-		// TODO: Rotate pointers instead of copying
-		// TODO: Data flow resembles a circular queue -> Implement a library.
-
-		//Swap the arrays [Copying]
-		for(i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacci[1].size - 1); i--)
-		{
-			fibonacci[0].number[i] = fibonacci[1].number[i];
-		}
-
-		for(i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacci[2].size - 1); i--)
-		{
-			fibonacci[1].number[i] = fibonacci[2].number[i];
-		}
-
-		//Swap the array sizes
-		fibonacci[0].size = fibonacci[1].size;
-		fibonacci[1].size = fibonacci[2].size;
+	
+		// Performance testing
+		endTime = clock();
+		totalTime = CalculateExecutionTime(startTime, endTime);
 	}
 
-	//Performance testing
-	endTime = clock();
+	// Print the fibonacci number
+	PrintFibonacci(fibonacciSumPtr, j);
 
-	//Print the fibonacci number
-	PrintFibonacci(&fibonacci[2], j);
-
-	//Print performance results
+	// Print performance results
 	totalTime = CalculateExecutionTime(startTime, endTime);
 	printf("\n\nCalculation Time: %Lf secs\n\n", totalTime);
 
