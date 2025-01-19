@@ -1,4 +1,3 @@
-#include<CircularQueue.h>
 #include<ctype.h>
 #include<limits.h>
 #include<stdio.h>
@@ -9,6 +8,8 @@
 #include<time.h>
 
 #define MAX_DIGITS 99999999
+#define NO_OF_ARRAYS 3
+
 
 struct CommandLineValidationResult{
 	bool decision;
@@ -28,6 +29,7 @@ void PrintFibonacci(struct Fibonacci* fibonacciPtr, unsigned long long int ordin
 	{
 		printf("%d", fibonacciPtr -> number[i]);
 	}
+
 	return;
 }
 
@@ -63,7 +65,7 @@ long long int ParseRange(char* argument)
 		}
 	}
 
-	// Case: No number
+	// If no number
 	if(argument[index] == '\0')
 	{
 		printf("\nValue not specified for argument: %s", argument);
@@ -73,7 +75,7 @@ long long int ParseRange(char* argument)
 
 	for(; argument[index] != '\0'; index++)
 	{
-		// Case: If malformed range input
+		// If malformed range input
 		if(isalpha(argument[index]) != 0)
 		{
 			printf("\nInvalid range: %s", argument);
@@ -81,7 +83,7 @@ long long int ParseRange(char* argument)
 			return -1;		
 		}
 
-		// Case: Number Exists
+		// If number exists
 		else
 		{
 			range *= 10;
@@ -114,9 +116,6 @@ long long int DecideRange(char* argument)
 
 struct CommandLineValidationResult CommandLineValidator(int argumentCount, char* arguments[])
 {
-	// Decision variable
-	// -1 -> Failed
-	//  0 -> Success
 	long long int range = 0;
 
 	if(argumentCount != 2)
@@ -134,12 +133,6 @@ struct CommandLineValidationResult CommandLineValidator(int argumentCount, char*
 	result.range = range;
 
 	return result;
-}
-
-void WriteToFile(FILE* filePtr, long double time, long long int number)
-{
-	fprintf(filePtr, "%lld,%lld,", number, (long long int)(time*10000000));
-	return;	
 }
 
 int main(int argc, char* argv[])
@@ -174,19 +167,10 @@ int main(int argc, char* argv[])
 	// Initial Run
 	bool isInitialRun = true;
 
-	// Setting Up Circular Queue
-	Insert(0);
-	Insert(1);
-	Insert(2);
-
 	// Array Pointers - Initial Conditions
 	struct Fibonacci *fibonacciNumber1Ptr;
 	struct Fibonacci *fibonacciNumber2Ptr;
 	struct Fibonacci *fibonacciSumPtr;
-
-	//File Handling
-	FILE* filePtr;
-	filePtr = fopen("stats.txt", "w");
 
 	// Performance testing
 	startTime = clock();
@@ -195,11 +179,11 @@ int main(int argc, char* argv[])
 	for(; j < (range - 1); j++)
 	{
 		// Pointer Swapping
-		fibonacciNumber1Ptr = &fibonacci[Peek()];
-		fibonacciNumber2Ptr = &fibonacci[Peek()];
-		fibonacciSumPtr = &fibonacci[Peek()];
-		Peek(); // Seeking Queue By 1 to maintain flow.
+		fibonacciNumber1Ptr = &fibonacci[(j + 0) % NO_OF_ARRAYS];
+		fibonacciNumber2Ptr = &fibonacci[(j + 1) % NO_OF_ARRAYS];
+		fibonacciSumPtr = &fibonacci[(j + 2) % NO_OF_ARRAYS];
 		fibonacciSumPtr -> size = fibonacciNumber2Ptr -> size;
+		
 		if(isInitialRun)
 		{
 			// Initialize size
@@ -219,7 +203,7 @@ int main(int argc, char* argv[])
 			sum = fibonacciNumber1Ptr -> number[i] + fibonacciNumber2Ptr -> number[i] + carry;
 			carry = 0;
 
-			// Case: Carry Generated
+			// If carry generated
 			if (sum > 9)
 			{
 				carry = 1;
@@ -248,11 +232,7 @@ int main(int argc, char* argv[])
 		// Performance testing
 		endTime = clock();
 		totalTime = CalculateExecutionTime(startTime, endTime);
-		WriteToFile(filePtr, totalTime, j + 1);
 	}
-
-	//Close file stream
-	fclose(filePtr);
 
 	// Print the fibonacci number
 	PrintFibonacci(fibonacciSumPtr, j);
