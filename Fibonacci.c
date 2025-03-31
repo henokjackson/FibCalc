@@ -38,7 +38,7 @@ long double CalculateExecutionTime(clock_t startTime, clock_t endTime)
 	return (long double)(endTime - startTime)/(CLOCKS_PER_SEC);
 }
 
-void DisplayCommandLineArgumentsHelp()
+void ShowCommandLineArgumentsHelp()
 {
 	printf("\n\nUsage: ./Fibonacci [RANGE ...]\n");
 	printf("Examples:\n");
@@ -60,7 +60,7 @@ long long int ParseRange(char* argument)
 		if(argument[index] != rangeArgumentString[index])
 		{
 			printf("\nUnknown argument: %s", argument);
-			DisplayCommandLineArgumentsHelp();
+			ShowCommandLineArgumentsHelp();
 			return -1;
 		}
 	}
@@ -69,7 +69,7 @@ long long int ParseRange(char* argument)
 	if(argument[index] == '\0')
 	{
 		printf("\nValue not specified for argument: %s", argument);
-		DisplayCommandLineArgumentsHelp();
+		ShowCommandLineArgumentsHelp();
 		return -1;
 	}
 
@@ -79,7 +79,7 @@ long long int ParseRange(char* argument)
 		if(isalpha(argument[index]) != 0)
 		{
 			printf("\nInvalid range: %s", argument);
-			DisplayCommandLineArgumentsHelp();
+			ShowCommandLineArgumentsHelp();
 			return -1;		
 		}
 
@@ -121,7 +121,7 @@ struct CommandLineValidationResult CommandLineValidator(int argumentCount, char*
 	if(argumentCount != 2)
 	{
 		printf("\nToo many arguments !");
-		DisplayCommandLineArgumentsHelp();
+		ShowCommandLineArgumentsHelp();
 	}
 	else
 	{
@@ -228,11 +228,12 @@ int main(int argc, char* argv[])
 				exit(0);
 			}
 		}
-	
-		// Performance testing
-		endTime = clock();
-		totalTime = CalculateExecutionTime(startTime, endTime);
+
 	}
+	
+	// Performance testing
+	endTime = clock();
+	totalTime = CalculateExecutionTime(startTime, endTime);
 
 	// Print the fibonacci number
 	PrintFibonacci(fibonacciSumPtr, j);
