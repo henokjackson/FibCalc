@@ -2,3 +2,5 @@ Fibonacci
 .vscode
 *.swp
 *.o
+*.i
+*.a
