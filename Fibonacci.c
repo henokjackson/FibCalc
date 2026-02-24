@@ -1,3 +1,4 @@
+// Copyright 2026. Henok Jackson
 #include<ctype.h>
 #include<limits.h>
 #include<stdio.h>
@@ -6,225 +7,214 @@
 #include<stdint.h>
 #include<stdbool.h>
 #include<time.h>
-#define MAX_DIGITS 99999999
-#define FIB_BUFFER_COUNT 2
 
-struct CommandLineValidationResult{
+#define MAX_DIGITS 99999999
+#define NO_OF_ARRAYS 3
+
+
+struct CommandLineValidationResult {
 	bool decision;
 	long long int range;
 }commandLineValidationResult;
 
-struct Fibonacci{
+struct Fibonacci {
 	uint8_t number[MAX_DIGITS];
 	long long int size;
-}fibonacci[FIB_BUFFER_COUNT];
+}fibonacci[3];
 
-void PrintFibonacci(const struct Fibonacci* fibonacciPtr, const unsigned long long int ordinal)
-{
-	printf("F(%lld) = ", ordinal);
-	for(int i = (MAX_DIGITS - fibonacciPtr -> size); i < MAX_DIGITS; i++)
-	{
+void PrintFibonacci(struct Fibonacci* fibonacciPtr, unsigned long long int ordinal) {
+	//Print the fibonacci number
+	printf("%lluth Fibonacci Number : \n\n", ordinal + 1);
+	for(int i = (MAX_DIGITS - fibonacciPtr -> size); i < MAX_DIGITS; i++) {
 		printf("%d", fibonacciPtr -> number[i]);
 	}
+
+	return;
 }
 
-long double CalculateExecutionTime(const clock_t startTime, const clock_t endTime)
-{
+long double CalculateExecutionTime(clock_t startTime, clock_t endTime) {
 	return (long double)(endTime - startTime)/(CLOCKS_PER_SEC);
 }
 
-void ShowCommandLineArgumentsHelp()
-{
-	const char* helpMessage = "\n\nUsage: ./Fibonacci [n...]\n"
-								"Specifying range:\n"
-								"\t-n=max\tGenerates the maximum possible fibonacci number that can be generated with the given stack.\n"
-								"\t-n=N\tGenerates the Nth fibonacci number if enough stack space is available.\n";
-	printf(helpMessage);
+void ShowCommandLineArgumentsHelp() {
+	printf("\n\nUsage: ./Fibonacci [RANGE ...]\n");
+	printf("Examples:\n");
+	printf("\tSpecifying range:\n");
+	printf("\t\t--range=max\tGenerates the maximum possible fibonacci number that can be generated with the given heap.\n");
+	printf("\t\t--range=N\tGenerates the Nth fibonacci number if enough heap space is available.\n");
+
+	return;
 }
 
-long long int ParseRange(char* argument)
-{
+long long int ParseRange(char* argument) {
 	int index = 0;
 	long long int range = 0;
-	for(const char* rangeArgumentString = "-n=\0"; rangeArgumentString[index] != '\0'; index++)
-	{
-		if(argument[index] != rangeArgumentString[index])
-		{
+	const char* rangeArgumentString = "--range=\0";
+
+	for(; rangeArgumentString[index] != '\0'; index++) {
+		if(argument[index] != rangeArgumentString[index]) {
 			printf("\nUnknown argument: %s", argument);
 			ShowCommandLineArgumentsHelp();
-
 			return -1;
 		}
 	}
 
-	// If the value of range is not specified.
-	if(argument[index] == '\0')
-	{
+	// If no number
+	if(argument[index] == '\0') {
 		printf("\nValue not specified for argument: %s", argument);
 		ShowCommandLineArgumentsHelp();
-
 		return -1;
 	}
 
-	for(; argument[index] != '\0'; index++)
-	{
-		// If input range is malformed
-		if(isdigit((unsigned char)argument[index]) == 0)
-		{
+	for(; argument[index] != '\0'; index++) {
+		// If malformed range input
+		if(isalpha(argument[index]) != 0) {
 			printf("\nInvalid range: %s", argument);
 			ShowCommandLineArgumentsHelp();
-
-			return -1;
-		}
-		// Parse the number
-		else
-		{
+			return -1;		
+		} else {
 			range *= 10;
 			// char -> int
 			range += (int)(argument[index] - '0');
 		}
 	}
 
-	// Invalid range
-	if(range <= 0)
-	{
-		printf("\nn should be greater than zero.");
-		ShowCommandLineArgumentsHelp();
-	}
-
 	return range;
 }
 
-long long int DecideRange(char* argument)
-{
+long long int DecideRange(char* argument) {
 	long long int range = 0;
-	if(strcmp(argument, "-n=max") == 0)
-	{
-		//TODO: Write the logic for setting range so that the loop runs infinitely.
+
+	if(strcmp(argument, "--range=max") == 0) {
+		//TODO: Write the logic for setting range so that the loop runs infinetly.
 		/**Currently using the max limit since it's impossible to estimate the highest
 		fibonacci number with 'n' digits.**/
 		range = ULLONG_MAX;
-	}
-	else
-	{
+	} else {
 		range = ParseRange(argument);
 	}
 
 	return range;
 }
 
-struct CommandLineValidationResult CommandLineValidator(const int argumentCount, char* arguments[])
-{
+struct CommandLineValidationResult CommandLineValidator(int argumentCount, char* arguments[]) {
 	long long int range = 0;
-	if(argumentCount != 2)
-	{
+
+	if(argumentCount != 2) {
 		printf("\nToo many arguments !");
 		ShowCommandLineArgumentsHelp();
-	}
-	else
-	{
+	} else {
 		range = DecideRange(arguments[1]);
 	}
+
 	struct CommandLineValidationResult result;
-	result.decision = (range == -1 || range == 0 ? false : true);
+	result.decision = (range == -1 || 0 ? false : true);
 	result.range = range;
 
 	return result;
 }
 
-int main(int argc, char* argv[])
-{
-	const struct CommandLineValidationResult result = CommandLineValidator(argc, argv);
-	if(!result.decision)
-	{
-		exit(0);
+int main(int argc, char* argv[]) {
+	// Validate commandline arguments
+	struct CommandLineValidationResult result = CommandLineValidator(argc, argv);
+	if(!result.decision) {
+		exit(EXIT_FAILURE);
 	}
 
 	system("clear");
 
-	// Performance Testing Parameters
+	// Performance testing parameters
 	clock_t startTime = 0;
 	clock_t endTime = 0;
 	long double totalTime = 0;
 	
 	// TODO: Write code such that the elements of the error will be set to zero prior to their setting of values.
+	// Initializing arrays
 	memset(fibonacci[0].number, 0, sizeof(fibonacci[0].number));
 	memset(fibonacci[1].number, 0, sizeof(fibonacci[1].number));
+	memset(fibonacci[2].number, 0, sizeof(fibonacci[2].number));
 
+	// Mathematical parameters
 	uint8_t carry = 0;
-	uint8_t sum = 0;
-	const long long int range = result.range;
+	uint8_t sum;
+	long long int i;
+	long long int j = 0;
+	long long int range = result.range;
 
+	// Initial Run
 	bool isInitialRun = true;
 
-	struct Fibonacci *fibonacciNumberPtr = &fibonacci[0];
-	fibonacciNumberPtr -> size = 1;
+	// Array Pointers - Initial Conditions
+	struct Fibonacci *fibonacciNumber1Ptr = NULL;
+	struct Fibonacci *fibonacciNumber2Ptr = NULL;
+	struct Fibonacci *fibonacciSumPtr = NULL;
 
-	struct Fibonacci *fibonacciSumPtr = &fibonacci[1];
-	fibonacciSumPtr -> size = 1;
-
-	// Performance Testing - Start
+	// Performance testing
 	startTime = clock();
 
-	// Calculate the Fibonacci Series
-	for(long long int j = 0; j <= (range - 1); j++)
-	{
+	// Calculate fibonacci series
+	for(; j < (range - 1); j++) {
 		// Pointer Swapping
-		fibonacciNumberPtr = &fibonacci[(j + 0) % FIB_BUFFER_COUNT];
-		fibonacciSumPtr = &fibonacci[(j + 1) % FIB_BUFFER_COUNT];
-
-		fibonacciSumPtr -> size = fibonacciNumberPtr -> size;
+		fibonacciNumber1Ptr = &fibonacci[(j + 0) % NO_OF_ARRAYS];
+		fibonacciNumber2Ptr = &fibonacci[(j + 1) % NO_OF_ARRAYS];
+		fibonacciSumPtr = &fibonacci[(j + 2) % NO_OF_ARRAYS];
+		fibonacciSumPtr -> size = fibonacciNumber2Ptr -> size;
 		
-		if(isInitialRun)
-		{
-			fibonacciNumberPtr -> size = 1;
+		if(isInitialRun) {
+			// Initialize size
+			fibonacciNumber1Ptr -> size = 1;
+			fibonacciNumber2Ptr -> size = 1;
 			fibonacciSumPtr -> size = 1;
 
-			fibonacciNumberPtr -> number[MAX_DIGITS - 1] = 0;
-			fibonacciSumPtr -> number[MAX_DIGITS - 1] = 1;
+			// Setting intial conditions
+			fibonacciNumber1Ptr -> number[MAX_DIGITS - 1] = 0;
+			fibonacciNumber2Ptr -> number[MAX_DIGITS - 1] = 1;
 
 			isInitialRun = false;
 		}
 
-		for(long long int i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacciSumPtr -> size - 1); i--)
-		{
-			sum = fibonacciNumberPtr -> number[i] + fibonacciSumPtr -> number[i] + carry;
+		for(i = (MAX_DIGITS - 1); i > (MAX_DIGITS - fibonacciSumPtr -> size - 1); i--) {
+			sum = fibonacciNumber1Ptr -> number[i] + fibonacciNumber2Ptr -> number[i] + carry;
 			carry = 0;
 
-			// When Carry Is Generated
-			if (sum > 9)
-			{
+			// If carry generated
+			if (sum > 9) {
 				carry = 1;
-				if((MAX_DIGITS - fibonacciNumberPtr -> size) == i)
-				{
+				if((MAX_DIGITS - fibonacciNumber2Ptr -> size) == i) {
 					fibonacciSumPtr -> size++;
 				}
 				fibonacciSumPtr -> number[i] = sum % 10;
-			}
-			else
-			{
+			} else {
 				fibonacciSumPtr -> number[i] = sum;
 			}
 
-			// Overflow Detection
-			if (fibonacciSumPtr -> number[0] != 0)
-			{
+			// Overflow detection
+			if (fibonacciSumPtr -> number[0] != 0) {
 				printf("Possible overflow in next iteration.\nTerminating....\n\n");
-				PrintFibonacci(fibonacciSumPtr, j + 1);
-				totalTime = CalculateExecutionTime(startTime, clock());
+				PrintFibonacci(fibonacciSumPtr, j);
+				endTime = clock();
+				totalTime = CalculateExecutionTime(startTime, endTime);
 				printf("\n\n\nCalculation Time: %Lf secs\n\n", totalTime);
-				exit(0);
+				exit(EXIT_SUCCESS);
 			}
 		}
+
 	}
 	
-	// Performance Testing - Stop
+	// Performance testing
 	endTime = clock();
+
+	// Print the fibonacci number
+	if(fibonacciSumPtr == NULL) {
+		printf("\nInternal Error !");
+		exit(EXIT_FAILURE);
+	}
+
+	PrintFibonacci(fibonacciSumPtr, j);
+
+	// Print performance results
 	totalTime = CalculateExecutionTime(startTime, endTime);
-
-	PrintFibonacci(fibonacciSumPtr, range);
-
-	printf("\n\nCalculation Time: %Lf seconds.\n\n", totalTime);
+	printf("\n\nCalculation Time: %Lf secs\n\n", totalTime);
 
 	return 0;
 }
